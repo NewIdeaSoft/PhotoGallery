@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,7 +51,8 @@ public class FlickrFetchr {
         return new String(getUrlBytes(urlSpec));
     }
 
-    public void fetchItems(){
+    public List<GalleryItem> fetchItems(){
+        List<GalleryItem> items = new ArrayList<>();
         try {
             String url = Uri.parse("https://api.flickr.com/services/rest/")
                     .buildUpon()
@@ -64,20 +66,29 @@ public class FlickrFetchr {
             Log.i(TAG,"received json:" + jsonString);
 
             JSONObject jsonBody = new JSONObject(jsonString);
+            parseItems(items,jsonBody);
         } catch (IOException e) {
             Log.e(TAG,"failed to fetch items:",e);
         } catch (JSONException e) {
             Log.e(TAG,"failed to parse Json:",e);
         }
+        return items;
     }
 
     private void parseItems(List<GalleryItem> items ,JSONObject jsonBody)
             throws IOException,JSONException{
         JSONObject photosJsonObject = jsonBody.getJSONObject("photos");
-        JSONArray photoJsonArray = jsonBody.getJSONArray("photo");
+        JSONArray photoJsonArray = photosJsonObject.getJSONArray("photo");
         for (int i = 0; i < photoJsonArray.length(); i++) {
             JSONObject jsonObject = photoJsonArray.getJSONObject(i);
             GalleryItem item = new GalleryItem();
+            item.setId(jsonObject.getString("id"));
+            item.setCaption(jsonObject.getString("title"));
+            if (!jsonObject.has("url_s")){
+                continue;
+            }
+            item.setUrl(jsonObject.getString("url_s"));
+            items.add(item);
         }
     }
 }
