@@ -124,6 +124,12 @@ public class PhotoGalleryFragment extends Fragment{
                 searchView.setQuery(query,false);
             }
         });
+        MenuItem toggleItem = menu.findItem(R.id.menu_item_toggle_pool);
+        if (PollService.isServiceAlarmOn(getActivity())){
+            toggleItem.setTitle(R.string.stop_poling);
+        }else{
+            toggleItem.setTitle(R.string.start_pooling);
+        }
     }
 
     @Override
@@ -132,6 +138,13 @@ public class PhotoGalleryFragment extends Fragment{
             case R.id.menu_item_search:
                 QueryPreference.setStoredQuery(getActivity(),null);
                 updateItems();
+                return true;
+            case R.id.menu_item_clear:
+                return true;
+            case R.id.menu_item_toggle_pool:
+                boolean shouldStartAlarm = !PollService.isServiceAlarmOn(getActivity());
+                PollService.setServiceAlarm(getActivity(),shouldStartAlarm);
+                getActivity().invalidateOptionsMenu();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
