@@ -20,7 +20,7 @@ import java.util.List;
 
 public class PollService extends IntentService {
     private static final String TAG = "PollService";
-    private static final long POLL_INTERVAL = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
+    private static final long POLL_INTERVAL = 60*1000;
 
     public static final String ACTION_SHOW_NOTIFICATION =
             "com.nisoft.photogallery.SHOW_NOTIFICATION";
@@ -120,7 +120,7 @@ public class PollService extends IntentService {
 
     public static boolean isServiceAlarmOn(Context context) {
         Intent intent = PollService.newIntent(context);
-        PendingIntent pi = PendingIntent.getService(context, 0, intent, 0);
+        PendingIntent pi = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_NO_CREATE);
         return pi != null;
     }
 }
